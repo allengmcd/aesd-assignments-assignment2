@@ -8,8 +8,8 @@ int main(int argc, char **argv)
 
     if(argc != 3)
     {
-        printf("Must have 2 arguments...\n");
         syslog(LOG_ERR, "Must have 2 arguments...\n");
+        closelog();
         return 1;
     }
 
@@ -21,6 +21,7 @@ int main(int argc, char **argv)
     file = fopen(writefile, "w");
     if (file == NULL) {
         syslog(LOG_ERR,"Error opening file...");
+        closelog();
         return 1; // Exit or handle the error
     }
 
