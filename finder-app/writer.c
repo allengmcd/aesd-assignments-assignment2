@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include<syslog.h>
+#include <fcntl.h>
+#include <unistd.h>   // For write() and close()
+#include <string.h>
 
 int main(int argc, char **argv)
 {
@@ -16,23 +19,21 @@ int main(int argc, char **argv)
     char* writefile = argv[1];
     char* writestr = argv[2];
 
-    FILE *file;
-
-    file = fopen(writefile, "w");
-    if (file == NULL) {
+    int file = open(writefile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (file == -1) {
         syslog(LOG_ERR,"Error opening file...");
         closelog();
         return 1; // Exit or handle the error
     }
 
     syslog(LOG_DEBUG, "Writing %s to %s", writestr, writestr);
-    if (fprintf(file, "%s", writestr) < 0) {
+    if (write(file, writestr, strlen(writestr)) == -1) {
         syslog(LOG_ERR,"Error writing to file...");
-        fclose(file);
+        close(file);
         return 1; // Exit or handle the error
     }
 
-    if (fclose(file) == EOF) {
+    if (close(file) == -1) {
         syslog(LOG_ERR,"Error closing file...");
         return 1; // Exit or handle the error
     }
